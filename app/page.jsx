@@ -4,11 +4,11 @@ import { useState } from "react";
 
 export default function ForexCalculator() {
   const [pair, setPair] = useState("EUR/USD");
-  const [accountSize, setAccountSize] = useState(5000);
-  const [riskPercent, setRiskPercent] = useState(1);
-  const [stopLossPips, setStopLossPips] = useState(50);
-  const [takeProfitPips, setTakeProfitPips] = useState(100);
-  const [lotSize, setLotSize] = useState(0.1);
+  const [accountSize, setAccountSize] = useState("");
+  const [riskPercent, setRiskPercent] = useState("");
+  const [stopLossPips, setStopLossPips] = useState("");
+  const [takeProfitPips, setTakeProfitPips] = useState("");
+  const [lotSize, setLotSize] = useState("");
   const [result, setResult] = useState(null);
 
   // Price Level Calculator States
@@ -64,18 +64,24 @@ export default function ForexCalculator() {
       takeProfitPrice,
       pair
     );
-    setStopLossPips(slPips);
-    setTakeProfitPips(tpPips);
+    setStopLossPips(slPips.toString());
+    setTakeProfitPips(tpPips.toString());
     setShowPriceHelper(false);
   };
 
   const handleCalculate = () => {
+    const accountSizeNum = Number.parseFloat(accountSize) || 5000;
+    const riskPercentNum = Number.parseFloat(riskPercent) || 1;
+    const stopLossPipsNum = Number.parseFloat(stopLossPips) || 0;
+    const takeProfitPipsNum = Number.parseFloat(takeProfitPips) || 0;
+    const lotSizeNum = Number.parseFloat(lotSize) || 0.1;
+
     const pipValuePerLot = pipValues[pair] || 10;
-    const pipValue = pipValuePerLot * lotSize;
-    const dollarRisk = pipValue * stopLossPips;
-    const potentialProfit = pipValue * takeProfitPips;
-    const maxRisk = (accountSize * riskPercent) / 100;
-    const riskRewardRatio = takeProfitPips / stopLossPips;
+    const pipValue = pipValuePerLot * lotSizeNum;
+    const dollarRisk = pipValue * stopLossPipsNum;
+    const potentialProfit = pipValue * takeProfitPipsNum;
+    const maxRisk = (accountSizeNum * riskPercentNum) / 100;
+    const riskRewardRatio = takeProfitPipsNum / stopLossPipsNum;
     const riskFeedback =
       dollarRisk <= maxRisk
         ? "✅ Risk is within your limit"
@@ -102,7 +108,8 @@ export default function ForexCalculator() {
           </h1>
           <p className="text-lg text-gray-600">Trading Risk Account Manager</p>
           <div className="inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mt-4">
-            Account Balance: ${accountSize.toLocaleString()}
+            Account Balance: $
+            {(Number.parseFloat(accountSize) || 5000).toLocaleString()}
           </div>
         </div>
 
@@ -143,7 +150,7 @@ export default function ForexCalculator() {
                         ? "150.123"
                         : "1.08500"
                     }
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
                     value={entryPrice}
                     onChange={(e) => setEntryPrice(e.target.value)}
                   />
@@ -169,7 +176,7 @@ export default function ForexCalculator() {
                         ? "149.623"
                         : "1.08000"
                     }
-                    className="w-full p-3 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    className="w-full p-3 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 placeholder-gray-500"
                     value={stopLossPrice}
                     onChange={(e) => setStopLossPrice(e.target.value)}
                   />
@@ -195,7 +202,7 @@ export default function ForexCalculator() {
                         ? "151.123"
                         : "1.09500"
                     }
-                    className="w-full p-3 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full p-3 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 placeholder-gray-500"
                     value={takeProfitPrice}
                     onChange={(e) => setTakeProfitPrice(e.target.value)}
                   />
@@ -209,7 +216,7 @@ export default function ForexCalculator() {
                     </h4>
                     <div className="text-sm space-y-1">
                       <div className="flex justify-between">
-                        <span>Stop Loss:</span>
+                        <span className="text-gray-700">Stop Loss:</span>
                         <span className="font-medium text-red-600">
                           {
                             calculatePips(
@@ -223,7 +230,7 @@ export default function ForexCalculator() {
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Take Profit:</span>
+                        <span className="text-gray-700">Take Profit:</span>
                         <span className="font-medium text-green-600">
                           {
                             calculatePips(
@@ -237,7 +244,7 @@ export default function ForexCalculator() {
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Risk:Reward:</span>
+                        <span className="text-gray-700">Risk:Reward:</span>
                         <span className="font-medium text-blue-600">
                           {(() => {
                             const { slPips, tpPips } = calculatePips(
@@ -290,7 +297,7 @@ export default function ForexCalculator() {
                   Currency Pair / Instrument
                 </label>
                 <select
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 bg-white"
                   value={pair}
                   onChange={(e) => setPair(e.target.value)}
                 >
@@ -309,9 +316,10 @@ export default function ForexCalculator() {
                 </label>
                 <input
                   type="number"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="5000"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 placeholder-gray-500 bg-white"
                   value={accountSize}
-                  onChange={(e) => setAccountSize(Number(e.target.value))}
+                  onChange={(e) => setAccountSize(e.target.value)}
                 />
               </div>
 
@@ -324,9 +332,10 @@ export default function ForexCalculator() {
                   min="0.5"
                   max="2"
                   step="0.1"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="1.5"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 placeholder-gray-500 bg-white"
                   value={riskPercent}
-                  onChange={(e) => setRiskPercent(Number(e.target.value))}
+                  onChange={(e) => setRiskPercent(e.target.value)}
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Recommended: 1-2% for funded accounts
@@ -336,9 +345,7 @@ export default function ForexCalculator() {
               {/* Pip Calculator Helper Button */}
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-blue-900">
-                    💡 Price Level Helper
-                  </h4>
+                  <h4 className="font-medium text-blue-900">💡 Price Level</h4>
                   <button
                     onClick={() => setShowPriceHelper(true)}
                     className="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
@@ -359,9 +366,10 @@ export default function ForexCalculator() {
                   </label>
                   <input
                     type="number"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                    placeholder="50"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-gray-900 placeholder-gray-500 bg-white"
                     value={stopLossPips}
-                    onChange={(e) => setStopLossPips(Number(e.target.value))}
+                    onChange={(e) => setStopLossPips(e.target.value)}
                   />
                 </div>
 
@@ -371,9 +379,10 @@ export default function ForexCalculator() {
                   </label>
                   <input
                     type="number"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    placeholder="100"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-gray-900 placeholder-gray-500 bg-white"
                     value={takeProfitPips}
-                    onChange={(e) => setTakeProfitPips(Number(e.target.value))}
+                    onChange={(e) => setTakeProfitPips(e.target.value)}
                   />
                 </div>
               </div>
@@ -386,9 +395,10 @@ export default function ForexCalculator() {
                   type="number"
                   step="0.01"
                   min="0.01"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="0.10"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 placeholder-gray-500 bg-white"
                   value={lotSize}
-                  onChange={(e) => setLotSize(Number(e.target.value))}
+                  onChange={(e) => setLotSize(e.target.value)}
                 />
               </div>
 
@@ -416,7 +426,7 @@ export default function ForexCalculator() {
                         : "bg-red-50 border-red-200"
                     }`}
                   >
-                    <div className="text-lg font-semibold mb-2">
+                    <div className="text-lg font-semibold mb-2 text-gray-900">
                       {result.feedback}
                     </div>
                   </div>
@@ -474,15 +484,23 @@ export default function ForexCalculator() {
                     </h3>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="text-blue-700">Instrument:</div>
-                      <div className="font-medium">{pair}</div>
+                      <div className="font-medium text-gray-900">{pair}</div>
                       <div className="text-blue-700">Lot Size:</div>
-                      <div className="font-medium">{lotSize}</div>
+                      <div className="font-medium text-gray-900">
+                        {lotSize || "0.10"}
+                      </div>
                       <div className="text-blue-700">Stop Loss:</div>
-                      <div className="font-medium">{stopLossPips} pips</div>
+                      <div className="font-medium text-gray-900">
+                        {stopLossPips || "0"} pips
+                      </div>
                       <div className="text-blue-700">Take Profit:</div>
-                      <div className="font-medium">{takeProfitPips} pips</div>
+                      <div className="font-medium text-gray-900">
+                        {takeProfitPips || "0"} pips
+                      </div>
                       <div className="text-blue-700">Risk %:</div>
-                      <div className="font-medium">{riskPercent}%</div>
+                      <div className="font-medium text-gray-900">
+                        {riskPercent || "1"}%
+                      </div>
                     </div>
                   </div>
 
@@ -496,14 +514,14 @@ export default function ForexCalculator() {
                         : "bg-red-50 border-red-200"
                     }`}
                   >
-                    <h4 className="font-semibold mb-2">
+                    <h4 className="font-semibold mb-2 text-gray-900">
                       {Number.parseFloat(result.riskRewardRatio) >= 2
                         ? "🎯 Excellent Risk:Reward Ratio!"
                         : Number.parseFloat(result.riskRewardRatio) >= 1.5
                         ? "⚡ Good Risk:Reward Ratio"
                         : "⚠️ Low Risk:Reward Ratio"}
                     </h4>
-                    <p className="text-sm">
+                    <p className="text-sm text-gray-700">
                       {Number.parseFloat(result.riskRewardRatio) >= 2
                         ? "This trade has an excellent risk-reward profile. You're risking $1 to potentially make $" +
                           result.riskRewardRatio
@@ -525,7 +543,7 @@ export default function ForexCalculator() {
                           {(
                             (Number.parseFloat(result.maxAllowed) /
                               Number.parseFloat(result.dollarRisk)) *
-                            lotSize
+                            (Number.parseFloat(lotSize) || 0.1)
                           ).toFixed(2)}
                         </li>
                         <li>
